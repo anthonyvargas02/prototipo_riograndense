@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "",
       `Nome: ${data.get("name")}`,
       `Telefone: ${data.get("phone")}`,
+      `Cidade: ${data.get("cidade")}`,
       `Implemento de interesse: ${data.get("product")}`,
     ];
     const details = String(data.get("message") || "").trim();

@@ -13,6 +13,7 @@
   --head: "Barlow Condensed", Impact, sans-serif;
   --body: "Inter", Arial, sans-serif;
   --max: 1180px;
+  --font-primary: "Neue Plak Condensed", sans-serif;
 }
 * {
   box-sizing: border-box;
@@ -24,7 +25,7 @@ html {
 body {
   margin: 0;
   color: var(--royal);
-  font-family: var(--body);
+  font-family: var(--font-primary);
   line-height: 1.6;
 }
 img {
@@ -39,7 +40,7 @@ button,
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: var(--font-primary);
 }
 button,
 a {
@@ -75,7 +76,7 @@ textarea:focus-visible {
   gap: 24px;
 }
 .brand img {
-  width: 205px;
+  width: 200px;
 }
 nav {
   display: flex;
@@ -136,7 +137,7 @@ nav .nav-cta {
   color: var(--digital-blue);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+ letter-spacing: 0.20px;
 }
 .eyebrow:before {
   content: "";
@@ -157,6 +158,7 @@ h3 {
   font-weight: 800;
   line-height: 0.98;
   text-transform: uppercase;
+  letter-spacing: 0.40px;
 }
 h1 {
   font-size: clamp(3.6rem, 8vw, 7rem);
@@ -315,9 +317,11 @@ h2 em {
   bottom: 0;
   color: var(--blue);
   font: 800 2.6rem var(--head);
+
 }
 .product-info {
   padding: 22px;
+
 }
 .product-info small {
   color: var(--blue);
@@ -328,6 +332,8 @@ h2 em {
 .product-info h3 {
   margin: 8px 0 10px;
   font-size: 1.8rem;
+  letter-spacing: 0.20px;
+  font-weight: 300;
 }
 .product-info p {
   min-height: 64px;
@@ -341,7 +347,7 @@ h2 em {
   background: none;
   color: var(--blue);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 900;
   cursor: pointer;
 }
 .text-link:hover {
@@ -423,6 +429,7 @@ h2 em {
 }
 .service-grid h3 {
   font-size: 1.6rem;
+  letter-spacing: 1px;
 }
 .service-grid p {
   margin: 0;

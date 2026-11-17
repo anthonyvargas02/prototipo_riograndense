@@ -1,0 +1,2 @@
+campo cidade obrigatório 
+ajustar fonte descrição nome dos implementos para mais fina e nitida com mais espaçamento entre letras
