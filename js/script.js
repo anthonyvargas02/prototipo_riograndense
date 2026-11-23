@@ -53,16 +53,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-product]").forEach((button) =>
     button.addEventListener("click", () => {
       const name = button.dataset.product;
-    const normalize = (value) =>
-  value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
+      const normalize = (value) =>
+        value
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "");
 
-const option = [...(select?.options || [])].find(
-  (item) => normalize(item.textContent) === normalize(name),
-);
+      const option = [...(select?.options || [])].find(
+        (item) => normalize(item.textContent) === normalize(name),
+      );
       if (option && select) select.value = option.value || option.text;
       document
         .querySelector("#orcamento")
@@ -95,550 +95,486 @@ const option = [...(select?.options || [])].find(
   if (year) year.textContent = new Date().getFullYear();
 });
 
-
 /*GALERIA DE IMPLEMENTOS*/
 
 document.addEventListener("DOMContentLoaded", () => {
+  const gallery = document.querySelector("#gallery-modal");
+
+  if (!gallery) {
+    console.warn("Modal da galeria não encontrado no HTML.");
+    return;
+  }
+
+  // ELEMENTOS DO MODAL
+
+  const galleryImage = document.querySelector("#gallery-main-image");
+  const galleryTitle = document.querySelector("#gallery-title");
+  const galleryDescription = document.querySelector("#gallery-description");
+  const galleryCategory = document.querySelector("#gallery-category");
+
+  const galleryCounter = document.querySelector("#gallery-counter");
+  const galleryProgress = document.querySelector("#gallery-progress");
+  const galleryThumbnails = document.querySelector("#gallery-thumbnails");
+
+  const gallerySpecifications = document.querySelector(
+    "#gallery-specifications",
+  );
+
+  const galleryManual = document.querySelector("#gallery-manual");
+  const galleryManualView = document.querySelector("#gallery-manual-view");
+  const galleryManualDownload = document.querySelector(
+    "#gallery-manual-download",
+  );
+
+  const closeButton = gallery.querySelector(".gallery-close");
+  const nextButton = gallery.querySelector(".gallery-next");
+  const prevButton = gallery.querySelector(".gallery-previous");
+  const backdrop = gallery.querySelector(".gallery-backdrop");
+
+  const contactButton = document.querySelector("#gallery-contact");
+  const productSelect = document.querySelector("#product");
+
+  if (
+    !galleryImage ||
+    !galleryTitle ||
+    !galleryDescription ||
+    !galleryCategory ||
+    !galleryCounter ||
+    !galleryProgress ||
+    !galleryThumbnails ||
+    !gallerySpecifications
+  ) {
+    console.error(
+      "Um ou mais elementos da galeria não foram encontrados no HTML.",
+    );
+    return;
+  }
+
+  let currentImages = [];
+  let currentIndex = 0;
+  let previousFocus = null;
+  let selectedProduct = null;
+
+  // CADASTRO DOS IMPLEMENTOS
+
+  const productGalleries = {
+    basculante: {
+      title: "Basculante",
+      category: "LINHA BASCULANTE",
+
+      description:
+        "Para operações que exigem agilidade no descarregamento de materiais a granel.",
+
+      images: [
+        "images/basculante/basculante_branco_1.png",
+        "images/basculante/basculante_branco_2.png",
+        "images/basculante/basculante_branco_3.png",
+        "images/basculante/basculante_cinza_1.png",
+        "images/basculante/basculante_cinza_2.png",
+        "images/basculante/basculante_cinza_3.png",
+      ],
+
+      specs: [],
+
+      manual: "manuais/basculante.pdf",
+    },
+
+    graneleira: {
+      title: "Graneleira",
+      category: "LINHA CARGA SECA",
+
+      description:
+        "Solução versátil para o transporte de grãos e cargas compatíveis.",
+
+      images: [
+        "images/graneleiro/graneleiro_1.png",
+        "images/graneleiro/graneleiro_2.png",
+        "images/graneleiro/graneleiro_3.png",
+        "images/graneleiro/graneleiro_preto_1.png",
+        "images/graneleiro/graneleiro_preto_2.png",
+      ],
+
+      specs: [],
+
+      manual: "manuais/graneleira.pdf",
+    },
+
+    tanque: {
+      title: "Tanque",
+      category: "LINHA ESPECIAL",
 
-    const gallery = document.querySelector("#gallery-modal");
+      description:
+        "Alternativa para operações de transporte de líquidos conforme especificação.",
 
-    if (!gallery) {
-        console.warn("Modal da galeria não encontrado no HTML.");
-        return;
-    }
+      images: [
+        "images/tanque/tanque_1.png",
+        "images/tanque/tanque_2.png",
+        "images/tanque/tanque_3.png",
+        "images/tanque/tanque_4.png",
+      ],
 
-    // ELEMENTOS DO MODAL
+      specs: [],
 
-    const galleryImage = document.querySelector("#gallery-main-image");
-    const galleryTitle = document.querySelector("#gallery-title");
-    const galleryDescription = document.querySelector("#gallery-description");
-    const galleryCategory = document.querySelector("#gallery-category");
+      manual: "manuais/tanque.pdf",
+    },
 
-    const galleryCounter = document.querySelector("#gallery-counter");
-    const galleryProgress = document.querySelector("#gallery-progress");
-    const galleryThumbnails = document.querySelector("#gallery-thumbnails");
+    furgao_lonado: {
+      title: "Furgão Lonado",
+      category: "LINHA CARGA SECA",
 
-    const gallerySpecifications = document.querySelector("#gallery-specifications");
+      description:
+        "Proteção da carga com praticidade para carga e descarga lateral.",
 
-    const galleryManual = document.querySelector("#gallery-manual");
-    const galleryManualView = document.querySelector("#gallery-manual-view");
-    const galleryManualDownload = document.querySelector("#gallery-manual-download");
+      images: [
+        "images/furgao_lonado/furgao_lonado_1.png",
+        "images/furgao_lonado/furgao_lonado_2.png",
+        "images/furgao_lonado/furgao_lonado_3.png",
+        "images/furgao_lonado/furgao_lonado_4.png",
+      ],
 
-    const closeButton = gallery.querySelector(".gallery-close");
-    const nextButton = gallery.querySelector(".gallery-next");
-    const prevButton = gallery.querySelector(".gallery-previous");
-    const backdrop = gallery.querySelector(".gallery-backdrop");
+      specs: [],
 
-    const contactButton = document.querySelector("#gallery-contact");
-    const productSelect = document.querySelector("#product");
+      manual: "manuais/furgao_lonado.pdf",
+    },
 
+    furgao_aluminio: {
+      title: "Furgão Alumínio",
+      category: "LINHA CARGA SECA",
 
+      description:
+        "Estrutura fechada para mercadorias que precisam de proteção.",
 
-    if (
-        !galleryImage ||
-        !galleryTitle ||
-        !galleryDescription ||
-        !galleryCategory ||
-        !galleryCounter ||
-        !galleryProgress ||
-        !galleryThumbnails ||
-        !gallerySpecifications
-    ) {
-        console.error("Um ou mais elementos da galeria não foram encontrados no HTML.");
-        return;
-    }
+      images: [
+        "images/furgao_aluminio/furgao_aluminio_1.png",
+        "images/furgao_aluminio/furgao_aluminio_2.png",
+        "images/furgao_aluminio/furgao_aluminio_3.png",
+        "images/furgao_aluminio/furgao_aluminio_4.png",
+      ],
 
-    let currentImages = [];
-    let currentIndex = 0;
-    let previousFocus = null;
-    let selectedProduct = null;
+      specs: [],
 
-    // CADASTRO DOS IMPLEMENTOS
+      manual: "manuais/furgao_aluminio.pdf",
+    },
 
-    const productGalleries = {
+    porta_conteiner: {
+      title: "Porta Contêiner",
+      category: "LINHA ESPECIAL",
 
-        basculante: {
-            title: "Basculante",
-            category: "LINHA BASCULANTE",
+      description: "Implemento destinado ao transporte de contêineres.",
 
-            description:
-                "Para operações que exigem agilidade no descarregamento de materiais a granel.",
+      images: [
+        "images/porta_conteiner/porta_conteiner_1.png",
+        "images/porta_conteiner/porta_conteiner_2.png",
+        "images/porta_conteiner/porta_conteiner_3.png",
+        "images/porta_conteiner/porta_conteiner_4.png",
+      ],
 
-            images: [
-                "images/basculante/basculante_branco_1.png",
-                "images/basculante/basculante_branco_2.png",
-                "images/basculante/basculante_branco_3.png",
-                "images/basculante/basculante_cinza_1.png",
-                "images/basculante/basculante_cinza_2.png",
-                "images/basculante/basculante_cinza_3.png"
-            ],
+      specs: [],
 
-            specs: [],
+      manual: "manuais/porta_conteiner.pdf",
+    },
 
-            manual: "manuais/basculante.pdf"
-        },
+    carrega_tudo: {
+      title: "Carrega Tudo",
+      category: "LINHA ESPECIAL",
 
-        graneleira: {
-            title: "Graneleira",
-            category: "LINHA CARGA SECA",
+      description: "Equipamento direcionado ao transporte de cargas especiais.",
 
-            description:
-                "Solução versátil para o transporte de grãos e cargas compatíveis.",
+      images: [
+        "images/carrega_tudo/carrega_tudo_1.png",
+        "images/carrega_tudo/carrega_tudo_2.png",
+        "images/carrega_tudo/carrega_tudo_3.png",
+      ],
 
-            images: [
-                "images/graneleiro/graneleiro_1.png",
-                "images/graneleiro/graneleiro_2.png",
-                "images/graneleiro/graneleiro_3.png",
-                "images/graneleiro/graneleiro_preto_1.png",
-                "images/graneleiro/graneleiro_preto_2.png"
-            ],
+      specs: [],
 
-            specs: [],
+      manual: "manuais/carrega_tudo.pdf",
+    },
 
-            manual: "manuais/graneleira.pdf"
-        },
+    florestal: {
+      title: "Florestal",
+      category: "LINHA ESPECIAL",
 
-        tanque: {
-            title: "Tanque",
-            category: "LINHA ESPECIAL",
+      description:
+        "Aplicação voltada ao transporte de madeira e operações florestais.",
 
-            description:
-                "Alternativa para operações de transporte de líquidos conforme especificação.",
+      images: [
+        "images/florestal/florestal_1.png",
+        "images/florestal/florestal_2.png",
+        "images/florestal/florestal_3.png",
+        "images/florestal/florestal_4.png",
+      ],
 
-            images: [
-                "images/tanque/tanque_1.png",
-                "images/tanque/tanque_2.png",
-                "images/tanque/tanque_3.png",
-                "images/tanque/tanque_4.png"
-            ],
+      specs: [],
 
-            specs: [],
+      manual: "manuais/florestal.pdf",
+    },
+  };
 
-            manual: "manuais/tanque.pdf"
-        },
+  // NORMALIZAR NOMES
 
-        furgao_lonado: {
-            title: "Furgão Lonado",
-            category: "LINHA CARGA SECA",
+  function normalizeName(value) {
+    return String(value)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  }
 
-            description:
-                "Proteção da carga com praticidade para carga e descarga lateral.",
+  // ATUALIZAR IMAGEM
 
-            images: [
-                "images/furgao_lonado/furgao_lonado_1.png",
-                "images/furgao_lonado/furgao_lonado_2.png",
-                "images/furgao_lonado/furgao_lonado_3.png",
-                "images/furgao_lonado/furgao_lonado_4.png"
-            ],
+  function renderGallery() {
+    const image = currentImages[currentIndex];
 
-            specs: [],
+    galleryImage.src = image;
 
-            manual: "manuais/furgao_lonado.pdf"
-        },
+    galleryImage.alt = `${selectedProduct.title} - Foto ${currentIndex + 1}`;
 
-        furgao_aluminio: {
-            title: "Furgão Alumínio",
-            category: "LINHA CARGA SECA",
+    galleryCounter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
 
-            description:
-                "Estrutura fechada para mercadorias que precisam de proteção.",
+    galleryProgress.style.width = `${((currentIndex + 1) / currentImages.length) * 100}%`;
 
-            images: [
-                "images/furgao_aluminio/furgao_aluminio_1.png",
-                "images/furgao_aluminio/furgao_aluminio_2.png",
-                "images/furgao_aluminio/furgao_aluminio_3.png",
-                "images/furgao_aluminio/furgao_aluminio_4.png"
-            ],
+    galleryThumbnails.querySelectorAll("button").forEach((button, index) => {
+      const active = index === currentIndex;
 
-            specs: [],
+      button.classList.toggle("is-active", active);
 
-            manual: "manuais/furgao_aluminio.pdf"
-        },
+      button.setAttribute("aria-pressed", String(active));
+    });
+  }
 
-        porta_conteiner: {
-            title: "Porta Contêiner",
-            category: "LINHA ESPECIAL",
+  // CRIAR MINIATURAS
 
-            description:
-                "Implemento destinado ao transporte de contêineres.",
+  function renderThumbnails() {
+    galleryThumbnails.innerHTML = "";
 
-            images: [
-                "images/porta_conteiner/porta_conteiner_1.png",
-                "images/porta_conteiner/porta_conteiner_2.png",
-                "images/porta_conteiner/porta_conteiner_3.png",
-                "images/porta_conteiner/porta_conteiner_4.png"
-            ],
+    currentImages.forEach((image, index) => {
+      const button = document.createElement("button");
 
-            specs: [],
+      button.type = "button";
+      button.className = "gallery-thumbnail";
 
-            manual: "manuais/porta_conteiner.pdf"
-        },
+      button.setAttribute("aria-label", `Visualizar foto ${index + 1}`);
+      button.setAttribute("aria-pressed", "false");
 
-        carrega_tudo: {
-            title: "Carrega Tudo",
-            category: "LINHA ESPECIAL",
+      const thumbnail = document.createElement("img");
 
-            description:
-                "Equipamento direcionado ao transporte de cargas especiais.",
+      thumbnail.src = image;
+      thumbnail.alt = "";
 
-            images: [
-                "images/carrega_tudo/carrega_tudo_1.png",
-                "images/carrega_tudo/carrega_tudo_2.png",
-                "images/carrega_tudo/carrega_tudo_3.png"
-            ],
+      button.appendChild(thumbnail);
 
-            specs: [],
+      button.addEventListener("click", () => {
+        currentIndex = index;
 
-            manual: "manuais/carrega_tudo.pdf"
-        },
+        renderGallery();
+      });
 
-        florestal: {
-            title: "Florestal",
-            category: "LINHA ESPECIAL",
+      galleryThumbnails.appendChild(button);
+    });
+  }
 
-            description:
-                "Aplicação voltada ao transporte de madeira e operações florestais.",
+  // CARREGAR ESPECIFICAÇÕES
 
-            images: [
-                "images/florestal/florestal_1.png",
-                "images/florestal/florestal_2.png",
-                "images/florestal/florestal_3.png",
-                "images/florestal/florestal_4.png"
-            ],
+  function renderSpecifications(specs) {
+    gallerySpecifications.innerHTML = "";
 
-            specs: [],
-
-            manual: "manuais/florestal.pdf"
-        }
-
-    };
-
-
-    // NORMALIZAR NOMES
-
-    function normalizeName(value) {
-
-        return String(value)
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "");
-
-    }
-
-
-    // ATUALIZAR IMAGEM
-
-    function renderGallery() {
-
-        const image = currentImages[currentIndex];
-
-        galleryImage.src = image;
-
-        galleryImage.alt =
-            `${selectedProduct.title} - Foto ${currentIndex + 1}`;
-
-        galleryCounter.textContent =
-            `${currentIndex + 1} / ${currentImages.length}`;
-
-        galleryProgress.style.width =
-            `${((currentIndex + 1) / currentImages.length) * 100}%`;
-
-        galleryThumbnails.querySelectorAll("button").forEach((button, index) => {
-
-            const active = index === currentIndex;
-
-            button.classList.toggle("is-active", active);
-
-            button.setAttribute("aria-pressed", String(active));
-
-        });
-
-    }
-
-
-    // CRIAR MINIATURAS
-
-    function renderThumbnails() {
-
-        galleryThumbnails.innerHTML = "";
-
-        currentImages.forEach((image, index) => {
-
-            const button = document.createElement("button");
-
-            button.type = "button";
-            button.className = "gallery-thumbnail";
-
-            button.setAttribute("aria-label", `Visualizar foto ${index + 1}`);
-            button.setAttribute("aria-pressed", "false");
-
-            const thumbnail = document.createElement("img");
-
-            thumbnail.src = image;
-            thumbnail.alt = "";
-
-            button.appendChild(thumbnail);
-
-            button.addEventListener("click", () => {
-
-                currentIndex = index;
-
-                renderGallery();
-
-            });
-
-            galleryThumbnails.appendChild(button);
-
-        });
-
-    }
-
-
-    // CARREGAR ESPECIFICAÇÕES
-
-    function renderSpecifications(specs) {
-
-        gallerySpecifications.innerHTML = "";
-
-        if (!specs || specs.length === 0) {
-
-            gallerySpecifications.innerHTML = `
+    if (!specs || specs.length === 0) {
+      gallerySpecifications.innerHTML = `
                 <p class="gallery-empty">
                     Consulte nossa equipe para informações técnicas.
                 </p>
             `;
 
-            return;
-
-        }
-
-        specs.forEach(spec => {
-
-            const item = document.createElement("div");
-
-            item.className = "gallery-spec-item";
-
-            const label = document.createElement("span");
-            label.textContent = spec.label;
-
-            const value = document.createElement("strong");
-            value.textContent = spec.value;
-
-            item.append(label, value);
-
-            gallerySpecifications.appendChild(item);
-
-        });
-
+      return;
     }
 
+    specs.forEach((spec) => {
+      const item = document.createElement("div");
 
-    // CARREGAR MANUAL PDF
+      item.className = "gallery-spec-item";
 
-    function renderManual(manualPath) {
+      const label = document.createElement("span");
+      label.textContent = spec.label;
 
-        if (!manualPath || !galleryManual || !galleryManualView || !galleryManualDownload) {
+      const value = document.createElement("strong");
+      value.textContent = spec.value;
 
-            if (galleryManual) {
-                galleryManual.hidden = true;
-            }
+      item.append(label, value);
 
-            return;
+      gallerySpecifications.appendChild(item);
+    });
+  }
 
-        }
+  // CARREGAR MANUAL PDF
 
-        galleryManual.hidden = false;
+  function renderManual(manualPath) {
+    if (
+      !manualPath ||
+      !galleryManual ||
+      !galleryManualView ||
+      !galleryManualDownload
+    ) {
+      if (galleryManual) {
+        galleryManual.hidden = true;
+      }
 
-        galleryManualView.href = manualPath;
-        galleryManualDownload.href = manualPath;
-
+      return;
     }
 
+    galleryManual.hidden = false;
 
-    // ABRIR MODAL
+    galleryManualView.href = manualPath;
+    galleryManualDownload.href = manualPath;
+  }
 
-    function openGallery(productKey) {
+  // ABRIR MODAL
 
-        const product = productGalleries[productKey];
+  function openGallery(productKey) {
+    const product = productGalleries[productKey];
 
-        if (!product) {
+    if (!product) {
+      console.warn("Implemento não encontrado:", productKey);
 
-            console.warn("Implemento não encontrado:", productKey);
-
-            return;
-
-        }
-
-        console.log("Abrindo galeria:", product.title);
-
-        selectedProduct = product;
-
-        currentImages = product.images;
-        currentIndex = 0;
-
-        previousFocus = document.activeElement;
-
-        galleryTitle.textContent = product.title;
-
-        galleryDescription.textContent = product.description;
-
-        galleryCategory.textContent = product.category;
-
-        renderSpecifications(product.specs);
-
-        renderManual(product.manual);
-
-        renderThumbnails();
-
-        renderGallery();
-
-        gallery.hidden = false;
-
-        gallery.classList.add("active");
-
-        gallery.setAttribute("aria-hidden", "false");
-
-        document.body.style.overflow = "hidden";
-
-        closeButton?.focus();
-
+      return;
     }
 
+    console.log("Abrindo galeria:", product.title);
 
-    // FECHAR MODAL
+    selectedProduct = product;
 
-    function closeGallery() {
+    currentImages = product.images;
+    currentIndex = 0;
 
-        gallery.classList.remove("active");
+    previousFocus = document.activeElement;
 
-        gallery.hidden = true;
+    galleryTitle.textContent = product.title;
 
-        gallery.setAttribute("aria-hidden", "true");
+    galleryDescription.textContent = product.description;
 
-        document.body.style.overflow = "";
+    galleryCategory.textContent = product.category;
 
-        if (previousFocus) {
-            previousFocus.focus();
-        }
+    renderSpecifications(product.specs);
 
+    renderManual(product.manual);
+
+    renderThumbnails();
+
+    renderGallery();
+
+    gallery.hidden = false;
+
+    gallery.classList.add("active");
+
+    gallery.setAttribute("aria-hidden", "false");
+
+    document.body.style.overflow = "hidden";
+
+    closeButton?.focus();
+  }
+
+  // FECHAR MODAL
+
+  function closeGallery() {
+    gallery.classList.remove("active");
+
+    gallery.hidden = true;
+
+    gallery.setAttribute("aria-hidden", "true");
+
+    document.body.style.overflow = "";
+
+    if (previousFocus) {
+      previousFocus.focus();
     }
+  }
 
+  // PRÓXIMA FOTO
 
-    // PRÓXIMA FOTO
+  function nextImage() {
+    if (!currentImages.length) return;
 
-    function nextImage() {
+    currentIndex = (currentIndex + 1) % currentImages.length;
 
-        if (!currentImages.length) return;
+    renderGallery();
+  }
 
-        currentIndex =
-            (currentIndex + 1) % currentImages.length;
+  // FOTO ANTERIOR
 
-        renderGallery();
+  function previousImage() {
+    if (!currentImages.length) return;
 
-    }
+    currentIndex =
+      (currentIndex - 1 + currentImages.length) % currentImages.length;
 
+    renderGallery();
+  }
 
-    // FOTO ANTERIOR
+  // SELECIONAR PRODUTO PARA ORÇAMENTO
 
-    function previousImage() {
+  contactButton?.addEventListener("click", () => {
+    if (!selectedProduct || !productSelect) return;
 
-        if (!currentImages.length) return;
-
-        currentIndex =
-            (currentIndex - 1 + currentImages.length) % currentImages.length;
-
-        renderGallery();
-
-    }
-
-
-    // SELECIONAR PRODUTO PARA ORÇAMENTO
-
-    contactButton?.addEventListener("click", () => {
-
-        if (!selectedProduct || !productSelect) return;
-
-        const option = [...productSelect.options].find(item => {
-
-            return normalizeName(item.textContent) ===
-                normalizeName(selectedProduct.title);
-
-        });
-
-        if (option) {
-
-            productSelect.value = option.value || option.textContent;
-
-        }
-
-        closeGallery();
-
-        document.querySelector("#orcamento")?.scrollIntoView({
-            behavior: "smooth"
-        });
-
-        document.querySelector("#name")?.focus({
-            preventScroll: true
-        });
-
+    const option = [...productSelect.options].find((item) => {
+      return (
+        normalizeName(item.textContent) === normalizeName(selectedProduct.title)
+      );
     });
 
+    if (option) {
+      productSelect.value = option.value || option.textContent;
+    }
 
-    // CLIQUE NOS CARDS
+    closeGallery();
 
-    document.querySelectorAll(".product-card[data-gallery]").forEach(card => {
-
-        card.addEventListener("click", event => {
-
-            if (event.target.closest("a, button")) return;
-
-            console.log("Produto clicado:", card.dataset.gallery);
-
-            openGallery(card.dataset.gallery);
-
-        });
-
+    document.querySelector("#orcamento")?.scrollIntoView({
+      behavior: "smooth",
     });
 
-
-    // CONTROLES
-
-    closeButton?.addEventListener("click", closeGallery);
-
-    nextButton?.addEventListener("click", nextImage);
-
-    prevButton?.addEventListener("click", previousImage);
-
-    backdrop?.addEventListener("click", closeGallery);
-
-
-    // TECLADO
-
-    document.addEventListener("keydown", event => {
-
-        if (gallery.hidden) return;
-
-        if (event.key === "Escape") {
-
-            closeGallery();
-
-        }
-
-        if (event.key === "ArrowRight") {
-
-            nextImage();
-
-        }
-
-        if (event.key === "ArrowLeft") {
-
-            previousImage();
-
-        }
-
+    document.querySelector("#name")?.focus({
+      preventScroll: true,
     });
+  });
 
-    console.log("Galeria de implementos carregada com sucesso.");
+  // CLIQUE NOS CARDS
 
+  document.querySelectorAll(".product-card[data-gallery]").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a, button")) return;
+
+      console.log("Produto clicado:", card.dataset.gallery);
+
+      openGallery(card.dataset.gallery);
+    });
+  });
+
+  // CONTROLES
+
+  closeButton?.addEventListener("click", closeGallery);
+
+  nextButton?.addEventListener("click", nextImage);
+
+  prevButton?.addEventListener("click", previousImage);
+
+  backdrop?.addEventListener("click", closeGallery);
+
+  // TECLADO
+
+  document.addEventListener("keydown", (event) => {
+    if (gallery.hidden) return;
+
+    if (event.key === "Escape") {
+      closeGallery();
+    }
+
+    if (event.key === "ArrowRight") {
+      nextImage();
+    }
+
+    if (event.key === "ArrowLeft") {
+      previousImage();
+    }
+  });
+
+  console.log("Galeria de implementos carregada com sucesso.");
 });
